@@ -6,14 +6,14 @@ namespace OpenStack\ObjectStore\v1\Models;
 
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Psr7\LimitStream;
-use Psr\Http\Message\ResponseInterface;
 use OpenStack\Common\Error\BadResponseError;
-use OpenStack\Common\Resource\OperatorResource;
 use OpenStack\Common\Resource\Creatable;
 use OpenStack\Common\Resource\Deletable;
 use OpenStack\Common\Resource\HasMetadata;
 use OpenStack\Common\Resource\Listable;
+use OpenStack\Common\Resource\OperatorResource;
 use OpenStack\Common\Resource\Retrievable;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * @property \OpenStack\ObjectStore\v1\Api $api
@@ -57,8 +57,6 @@ class Container extends OperatorResource implements Creatable, Deletable, Retrie
      *
      * @param array         $options {@see \OpenStack\ObjectStore\v1\Api::getContainer}
      * @param callable|null $mapFn   allows a function to be mapped over each element
-     *
-     * @return \Generator
      */
     public function listObjects(array $options = [], callable $mapFn = null): \Generator
     {
@@ -152,8 +150,6 @@ class Container extends OperatorResource implements Creatable, Deletable, Retrie
      * {@see StorageObject::retrieve} or {@see StorageObject::download} on the returned StorageObject object to do that.
      *
      * @param string $name The name of the object
-     *
-     * @return StorageObject
      */
     public function getObject($name): StorageObject
     {
@@ -185,6 +181,22 @@ class Container extends OperatorResource implements Creatable, Deletable, Retrie
     }
 
     /**
+     * Verifies if provied segment index format for DLOs is valid.
+     * 
+     * @param string $fmt The format of segment index name, e.g. %05d for 00001, 00002, etc.
+     * 
+     * @return bool TRUE if the format is valid, FALSE if it is not
+     */
+    public function isValidSegmentIndexFormat($fmt)
+    {
+        $testValue1 = sprintf($fmt, 1);
+        $testValue2 = sprintf($fmt, 10);
+    
+        // Test if different results of the same string length
+        return ($testValue1 !== $testValue2) && (strlen($testValue1) === strlen($testValue2));
+    }
+
+    /**
      * Creates a single object according to the values provided.
      *
      * @param array $data {@see \OpenStack\ObjectStore\v1\Api::putObject}
@@ -201,13 +213,12 @@ class Container extends OperatorResource implements Creatable, Deletable, Retrie
      * container. When this completes, a manifest file is uploaded which references the prefix of the segments,
      * allowing concatenation when a request is executed against the manifest.
      *
-     * @param array  $data                     {@see \OpenStack\ObjectStore\v1\Api::putObject}
-     * @param int    $data['segmentSize']      The size in Bytes of each segment
-     * @param string $data['segmentContainer'] The container to which each segment will be uploaded
-     * @param string $data['segmentPrefix']    The prefix that will come before each segment. If omitted, a default
-     *                                         is used: name/timestamp/filesize
-     *
-     * @return StorageObject
+     * @param array  $data                       {@see \OpenStack\ObjectStore\v1\Api::putObject}
+     * @param int    $data['segmentSize']        The size in Bytes of each segment
+     * @param string $data['segmentContainer']   The container to which each segment will be uploaded
+     * @param string $data['segmentPrefix']      The prefix that will come before each segment. If omitted, a default
+     *                                           is used: name/timestamp/filesize
+     * @param string $data['segmentIndexFormat'] The format of segment index name, default %05d - 00001, 00002, etc.
      */
     public function createLargeObject(array $data): StorageObject
     {
@@ -219,6 +230,11 @@ class Container extends OperatorResource implements Creatable, Deletable, Retrie
         $segmentPrefix    = isset($data['segmentPrefix'])
             ? $data['segmentPrefix']
             : sprintf('%s/%s/%d', $data['name'], microtime(true), $stream->getSize());
+        $segmentIndexFormat = isset($data['segmentIndexFormat']) ? $data['segmentIndexFormat'] : '%05d';
+
+        if (!$this->isValidSegmentIndexFormat($segmentIndexFormat)) {
+            throw new \InvalidArgumentException('The provided segmentIndexFormat is not valid.');
+        }
 
         /** @var \OpenStack\ObjectStore\v1\Service $service */
         $service = $this->getService();
@@ -232,14 +248,16 @@ class Container extends OperatorResource implements Creatable, Deletable, Retrie
 
         while (!$stream->eof() && $count < $totalSegments) {
             $promises[] = $this->model(StorageObject::class)->createAsync([
-                'name'          => sprintf('%s/%d', $segmentPrefix, ++$count),
+                'name'          => sprintf('%s/'.$segmentIndexFormat, $segmentPrefix, ++$count),
                 'stream'        => new LimitStream($stream, $segmentSize, ($count - 1) * $segmentSize),
                 'containerName' => $segmentContainer,
             ]);
         }
 
         /** @var Promise $p */
-        $p = \GuzzleHttp\Promise\all($promises);
+        $p = function_exists('\GuzzleHttp\Promise\all')
+            ? \GuzzleHttp\Promise\all($promises)
+            : \GuzzleHttp\Promise\Utils::all($promises);
         $p->wait();
 
         return $this->createObject([
