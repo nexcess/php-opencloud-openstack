@@ -2,7 +2,6 @@
 
 namespace OpenStack\Integration\Networking\v2;
 
-use Guzzle\Tests\Service\Mock\Command\Sub\Sub;
 use OpenStack\Integration\TestCase;
 use OpenStack\Networking\v2\Extensions\Layer3\Models\FloatingIp;
 use OpenStack\Networking\v2\Models\Network;
@@ -28,7 +27,7 @@ class Layer3Test extends TestCase
         $this->outputTimeTaken();
     }
 
-    public function teardown()
+    public function teardown(): void
     {
         parent::teardown();
 
@@ -118,9 +117,9 @@ class Layer3Test extends TestCase
         /** @var FloatingIp $ip */
         $path = $this->sampleFile($replacements, 'floatingIPs/create.php');
         require_once $path;
-        $this->assertInstanceOf(FloatingIp::class, $ip);
-        $this->assertEquals($externalNetwork->id, $ip->floatingNetworkId);
-        $this->assertEquals($port1->id, $ip->portId);
+        self::assertInstanceOf(FloatingIp::class, $ip);
+        self::assertEquals($externalNetwork->id, $ip->floatingNetworkId);
+        self::assertEquals($port1->id, $ip->portId);
 
         $this->logStep('List floating IPs');
         $path = $this->sampleFile($replacements, 'floatingIPs/list.php');
@@ -130,7 +129,7 @@ class Layer3Test extends TestCase
         $replacements['{id}'] = $ip->id;
         $path = $this->sampleFile($replacements, 'floatingIPs/get.php');
         require_once $path;
-        $this->assertInstanceOf(FloatingIp::class, $ip);
+        self::assertInstanceOf(FloatingIp::class, $ip);
 
         $this->logStep('Update floating IP');
         $port2 = $this->createPort($internalNetwork);

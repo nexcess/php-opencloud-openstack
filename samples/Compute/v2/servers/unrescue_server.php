@@ -18,4 +18,5 @@ $server = $compute->getServer([
     'id' => '{serverId}',
 ]);
 
-$server->confirmResize();
+$server->waitUntil('RESCUE');
+$server->unrescue();

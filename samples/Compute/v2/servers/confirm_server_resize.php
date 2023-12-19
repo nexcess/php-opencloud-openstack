@@ -14,4 +14,9 @@ $openstack = new OpenStack\OpenStack([
 
 $compute = $openstack->computeV2(['region' => '{region}']);
 
-$image = $compute->getImage(['id' => '{imageId}']);
+$server = $compute->getServer([
+    'id' => '{serverId}',
+]);
+
+$server->waitUntil('VERIFY_RESIZE');
+$server->confirmResize();
