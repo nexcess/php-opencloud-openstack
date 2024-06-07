@@ -12,10 +12,12 @@ use OpenStack\Compute\v2\Models\Limit;
 use OpenStack\Compute\v2\Models\Server;
 use OpenStack\Integration\TestCase;
 use OpenStack\Integration\Utils;
+use OpenStack\Networking\v2\Extensions\SecurityGroups\Models\SecurityGroup;
 use OpenStack\Networking\v2\Models\Network;
 use OpenStack\Networking\v2\Models\Subnet;
 use OpenStack\Networking\v2\Service as NetworkService;
 use OpenStack\BlockStorage\v2\Service as BlockStorageService;
+use OpenStack\Networking\v2\Extensions\SecurityGroups\Service as SecurityGroupService;
 
 class CoreTest extends TestCase
 {
@@ -23,6 +25,8 @@ class CoreTest extends TestCase
     const NETWORK = 'phptest_network';
     const SUBNET = 'phptest_subnet';
     const VOLUME = 'phptest_volume';
+
+    const SECGROUP = 'phptest_secgroup';
 
     const IMAGE = 'cirros';
 
@@ -32,6 +36,9 @@ class CoreTest extends TestCase
     /** @var BlockStorageService */
     private $blockStorageService;
 
+    /** @var SecurityGroupService */
+    private $secgroupService;
+
     /** @var  Network */
     private $network;
 
@@ -40,6 +47,9 @@ class CoreTest extends TestCase
 
     /** @var  Volume */
     private $volume;
+
+    /** @var SecurityGroup */
+    private $secgroup;
 
     // Core test
     private $service;
@@ -68,6 +78,12 @@ class CoreTest extends TestCase
         return $this->networkService;
     }
 
+    private function getSecurityGroupService(): SecurityGroupService
+    {
+        $this->secgroupService = $this->secgroupService ?? Utils::getOpenStack()->networkingV2ExtSecGroups();
+        return $this->secgroupService;
+    }
+
     private function getBlockStorageService()
     {
         if (!$this->blockStorageService) {
@@ -91,7 +107,7 @@ class CoreTest extends TestCase
         }
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->network = $this->getNetworkService()->createNetwork(
             [
@@ -100,7 +116,7 @@ class CoreTest extends TestCase
             ]
         );
 
-        $this->logStep('Created network {name} with id {id}', ['name' => $this->network->name, 'id' => $this->network->id]);
+        $this->logStep('Created network {name} with {id}', ['name' => $this->network->name, 'id' => $this->network->id]);
 
         $this->subnet = $this->getNetworkService()->createSubnet(
             [
@@ -111,7 +127,7 @@ class CoreTest extends TestCase
             ]
         );
 
-        $this->logStep('Created subnet {name} with id {id}', ['name' => $this->subnet->name, 'id' => $this->subnet->id]);
+        $this->logStep('Created subnet {name} with {id}', ['name' => $this->subnet->name, 'id' => $this->subnet->id]);
 
         $this->volume = $this->getBlockStorageService()->createVolume(
             [
@@ -121,7 +137,11 @@ class CoreTest extends TestCase
             ]
         );
 
-        $this->logStep('Created volume {name} with id {id}', ['name' => $this->volume->name, 'id' => $this->volume->id]);
+        $this->logStep('Created volume {name} with {id}', ['name' => $this->volume->name, 'id' => $this->volume->id]);
+
+        $this->secgroup = $this->getSecurityGroupService()->createSecurityGroup(['name' => self::SECGROUP]);
+
+        $this->logStep('Created security group {secgroup}', ['secgroup' => self::SECGROUP]);
     }
 
     public function runTests()
@@ -195,12 +215,14 @@ class CoreTest extends TestCase
             // Interface attachments
             $this->createInterfaceAttachment();
         } finally {
+            $this->logger->info('Tearing down');
             // Teardown
             $this->deleteServer();
             $this->deleteFlavor();
             $this->subnet->delete();
             $this->network->delete();
             $this->volume->delete();
+            $this->secgroup->delete();
         }
 
         $this->outputTimeTaken();
@@ -227,9 +249,9 @@ class CoreTest extends TestCase
 
         $server->waitUntilActive(false);
 
-        $this->assertInstanceOf('OpenStack\Compute\v2\Models\Server', $server);
-        $this->assertNotEmpty($server->id);
-        $this->assertNotEmpty($server->adminPass);
+        self::assertInstanceOf('OpenStack\Compute\v2\Models\Server', $server);
+        self::assertNotEmpty($server->id);
+        self::assertNotEmpty($server->adminPass);
 
         $this->serverId = $server->id;
         $this->adminPass = $server->adminPass;
@@ -250,8 +272,8 @@ class CoreTest extends TestCase
         $path = $this->sampleFile($replacements, 'servers/update_server.php');
         require_once $path;
 
-        $this->assertInstanceOf('OpenStack\Compute\v2\Models\Server', $server);
-        $this->assertEquals($name, $server->name);
+        self::assertInstanceOf('OpenStack\Compute\v2\Models\Server', $server);
+        self::assertEquals($name, $server->name);
 
         $server->waitUntilActive(false);
 
@@ -279,15 +301,15 @@ class CoreTest extends TestCase
         $path = $this->sampleFile($replacements, 'servers/get_server.php');
         require_once $path;
 
-        $this->assertInstanceOf('OpenStack\Compute\v2\Models\Server', $server);
-        $this->assertEquals($this->serverId, $server->id);
-        $this->assertNotNull($server->created);
-        $this->assertNotNull($server->updated);
-        $this->assertNotNull($server->name);
-        $this->assertNotNull($server->ipv4);
-        $this->assertNotNull($server->status);
-        $this->assertInstanceOf(Image::class, $server->image);
-        $this->assertInstanceOf(Flavor::class, $server->flavor);
+        self::assertInstanceOf('OpenStack\Compute\v2\Models\Server', $server);
+        self::assertEquals($this->serverId, $server->id);
+        self::assertNotNull($server->created);
+        self::assertNotNull($server->updated);
+        self::assertNotNull($server->name);
+        self::assertNotNull($server->ipv4);
+        self::assertNotNull($server->status);
+        self::assertInstanceOf(Image::class, $server->image);
+        self::assertInstanceOf(Flavor::class, $server->flavor);
 
         $this->logStep('Retrieved the details of server ID', ['ID' => $this->serverId]);
     }
@@ -343,6 +365,7 @@ class CoreTest extends TestCase
 
     private function confirmServerResize()
     {
+        $this->logger->info('Waiting for status VERIFY_RESIZE');
         $replacements = ['{serverId}' => $this->serverId];
 
         /** @var $server \OpenStack\Compute\v2\Models\Server */
@@ -459,7 +482,7 @@ class CoreTest extends TestCase
         $path = $this->sampleFile($replacements, 'flavors/create_flavor.php');
         require_once $path;
 
-        $this->assertInstanceOf('\OpenStack\Compute\v2\Models\Flavor', $flavor);
+        self::assertInstanceOf('\OpenStack\Compute\v2\Models\Flavor', $flavor);
 
         $this->flavorId = $flavor->id;
         $this->logStep('Created flavor {id}', ['{id}' => $flavor->id]);
@@ -555,7 +578,7 @@ class CoreTest extends TestCase
         /** @var $keypairs \Generator */
         require_once $this->sampleFile([], 'keypairs/list_keypairs.php');
 
-        $this->assertInstanceOf(\Generator::class, $keypairs);
+        self::assertInstanceOf(\Generator::class, $keypairs);
 
         $this->logStep('Listed all keypairs');
     }
@@ -570,9 +593,9 @@ class CoreTest extends TestCase
         require_once $this->sampleFile($replacements, 'keypairs/create_keypair.php');
         /**@var Keypair $keypair */
 
-        $this->assertInstanceOf(Keypair::class, $keypair);
-        $this->assertEquals($replacements['{name}'], $keypair->name);
-        $this->assertEquals($replacements['{publicKey}'], $keypair->publicKey);
+        self::assertInstanceOf(Keypair::class, $keypair);
+        self::assertEquals($replacements['{name}'], $keypair->name);
+        self::assertEquals($replacements['{publicKey}'], $keypair->publicKey);
 
         $this->keypairName = $keypair->name;
         $this->logStep('Created keypair name {name}', ['{name}' => $keypair->name]);
@@ -587,9 +610,9 @@ class CoreTest extends TestCase
         require_once $this->sampleFile($replacements, 'keypairs/get_keypair.php');
 
         /**@var Keypair $keypair */
-        $this->assertInstanceOf(Keypair::class, $keypair);
+        self::assertInstanceOf(Keypair::class, $keypair);
 
-        $this->assertEquals($replacements['{name}'], $keypair->name);
+        self::assertEquals($replacements['{name}'], $keypair->name);
 
         $this->logStep('Retrieved details for keypair {name}', $replacements);
     }
@@ -620,8 +643,8 @@ class CoreTest extends TestCase
         require_once $this->sampleFile($replacements, 'hypervisors/get_hypervisor.php');
 
         /**@var Hypervisor $hypervisor */
-        $this->assertInstanceOf(Hypervisor::class, $hypervisor);
-        $this->assertEquals($replacements['{hypervisorId}'], $hypervisor->id);
+        self::assertInstanceOf(Hypervisor::class, $hypervisor);
+        self::assertEquals($replacements['{hypervisorId}'], $hypervisor->id);
 
         $this->logStep('Retrieved details for hypervisor id {hypervisorId}', $replacements);
     }
@@ -631,7 +654,7 @@ class CoreTest extends TestCase
         require_once  $this->sampleFile([], 'hypervisors/get_hypervisors_statistics.php');
 
         /**@var HypervisorStatistic $hypervisorStatistics */
-        $this->assertInstanceOf(HypervisorStatistic::class, $hypervisorStatistics);
+        self::assertInstanceOf(HypervisorStatistic::class, $hypervisorStatistics);
 
         $this->logStep('Retrieved hypervisors statistics');
     }
@@ -641,7 +664,7 @@ class CoreTest extends TestCase
         require_once $this->sampleFile([], 'limits/get_limits.php');
 
         /**@var Limit $limit */
-        $this->assertInstanceOf(Limit::class, $limit);
+        self::assertInstanceOf(Limit::class, $limit);
 
         $this->logStep('Retrieved tenant limit');
     }
@@ -649,8 +672,8 @@ class CoreTest extends TestCase
     private function addSecurityGroupToServer()
     {
         $replacements = [
-            '{serverId}' => $this->serverId,
-            '{secGroupName}' => 'default'
+            '{serverId}'     => $this->serverId,
+            '{secGroupName}' => self::SECGROUP,
         ];
 
         require_once  $this->sampleFile($replacements, 'servers/add_security_group.php');
@@ -668,7 +691,7 @@ class CoreTest extends TestCase
         require_once  $this->sampleFile($replacements, 'servers/list_security_groups.php');
 
         /**@var \Generator $securityGroups */
-        $this->assertInstanceOf(\Generator::class, $securityGroups);
+        self::assertInstanceOf(\Generator::class, $securityGroups);
 
         $this->logStep('Listed all security groups attached to server {serverId}', $replacements);
     }
@@ -676,8 +699,8 @@ class CoreTest extends TestCase
     private function removeServerSecurityGroup()
     {
         $replacements = [
-            '{serverId}' => $this->serverId,
-            '{secGroupName}' => 'default'
+            '{serverId}'     => $this->serverId,
+            '{secGroupName}' => self::SECGROUP,
         ];
 
         require_once $this->sampleFile($replacements, 'servers/remove_security_group.php');

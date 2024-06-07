@@ -14,8 +14,6 @@ $openstack = new OpenStack\OpenStack([
 
 $compute = $openstack->computeV2(['region' => '{region}']);
 
-$server = $compute->getServer([
-    'id' => '{serverId}',
-]);
+$image = $compute->getImage(['id' => '{imageId}']);
 
-$server->unrescue();
+$image->delete();
