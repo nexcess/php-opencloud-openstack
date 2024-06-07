@@ -1,5 +1,5 @@
 {
-    "name": "php-opencloud/openstack",
+    "name": "nocworx/php-opencloud-openstack",
     "description": "PHP SDK for OpenStack APIs. Supports BlockStorage, Compute, Identity, Images, Networking and Metric Gnocchi",
     "keywords": [
         "php",
@@ -21,6 +21,9 @@
             "homepage" : "https://github.com/haphan"
         }
     ],
+    "replace": {
+        "php-opencloud/openstack": "3.2"
+    },
     "autoload": {
         "psr-4": {
             "OpenStack\\": "src/"
