@@ -22,7 +22,7 @@
         }
     ],
     "replace": {
-        "php-opencloud/openstack": "3.2"
+        "php-opencloud/openstack": "*"
     },
     "autoload": {
         "psr-4": {
