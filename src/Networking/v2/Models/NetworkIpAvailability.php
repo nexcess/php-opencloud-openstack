@@ -1,10 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace OpenStack\Networking\v2\Models;
 
-use OpenStack\Common\Resource\OperatorResource;
 use OpenStack\Common\Resource\HasWaiterTrait;
 use OpenStack\Common\Resource\Listable;
+use OpenStack\Common\Resource\OperatorResource;
 use OpenStack\Common\Resource\Retrievable;
 
 /**
@@ -44,10 +46,10 @@ class NetworkIpAvailability extends OperatorResource implements Listable, Retrie
         'project_id'             => 'projectId',
         'total_ips'              => 'totalIps',
         'used_ips'               => 'usedIps',
-        'subnet_ip_availability' => 'subnetIpAvailability'
+        'subnet_ip_availability' => 'subnetIpAvailability',
     ];
 
-    protected $resourceKey = 'network_ip_availability';
+    protected $resourceKey  = 'network_ip_availability';
     protected $resourcesKey = 'network_ip_availabilities';
 
     /**
@@ -55,7 +57,7 @@ class NetworkIpAvailability extends OperatorResource implements Listable, Retrie
      */
     public function retrieve()
     {
-        $response = $this->execute($this->api->getNetworkIpAvailability(), ['id' => (string)$this->id]);
+        $response = $this->execute($this->api->getNetworkIpAvailability(), ['id' => (string) $this->id]);
         $this->populateFromResponse($response);
     }
 }

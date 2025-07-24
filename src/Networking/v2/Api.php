@@ -709,11 +709,11 @@ class Api extends AbstractApi
         ];
     }
 
-    public function getNetworkIpAvailability() : array
+    public function getNetworkIpAvailability(): array
     {
         return [
             'method' => 'GET',
-            'path'   => $this->pathPrefix . '/network-ip-availabilities/{id}',
+            'path'   => $this->pathPrefix.'/network-ip-availabilities/{id}',
             'params' => ['id' => $this->params->urlId('network')],
         ];
     }
@@ -722,10 +722,10 @@ class Api extends AbstractApi
     {
         return [
             'method' => 'GET',
-            'path'   => $this->pathPrefix . '/network-ip-availabilities',
+            'path'   => $this->pathPrefix.'/network-ip-availabilities',
             'params' => [
-                'tenantId' => $this->params->queryTenantId()
-            ]
+                'tenantId' => $this->params->queryTenantId(),
+            ],
         ];
     }
 }

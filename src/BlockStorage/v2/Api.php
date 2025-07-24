@@ -368,7 +368,7 @@ class Api extends AbstractApi
             'jsonKey' => 'os-reset_status',
             'params'  => [
                 'id'     => $this->params->idPath(),
-                'status' => $this->params->status()
+                'status' => $this->params->status(),
             ],
         ];
     }
