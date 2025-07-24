@@ -332,31 +332,31 @@ class Api extends AbstractApi
         ];
     }
 
-    public function resumeServer() : array
+    public function resumeServer(): array
     {
         return [
             'method'  => 'POST',
             'path'    => 'servers/{id}/action',
             'params'  => [
                 'id'      => $this->params->urlId('server'),
-                'resume' => $this->params->nullAction()
+                'resume'  => $this->params->nullAction(),
             ],
         ];
     }
 
-    public function suspendServer() : array
+    public function suspendServer(): array
     {
         return [
             'method'  => 'POST',
             'path'    => 'servers/{id}/action',
             'params'  => [
                 'id'      => $this->params->urlId('server'),
-                'suspend' => $this->params->nullAction()
+                'suspend' => $this->params->nullAction(),
             ],
         ];
     }
 
-    public function shelveServer() : array
+    public function shelveServer(): array
     {
         return [
             'method'  => 'POST',
@@ -368,50 +368,50 @@ class Api extends AbstractApi
         ];
     }
 
-    public function shelveOffloadServer() : array
+    public function shelveOffloadServer(): array
     {
         return [
             'method'  => 'POST',
             'path'    => 'servers/{id}/action',
             'params'  => [
                 'id'            => $this->params->urlId('server'),
-                'shelveOffload' => $this->params->nullAction()
+                'shelveOffload' => $this->params->nullAction(),
             ],
         ];
     }
 
-    public function unshelveServer() : array
+    public function unshelveServer(): array
     {
         return [
             'method'  => 'POST',
             'path'    => 'servers/{id}/action',
             'params'  => [
                 'id'       => $this->params->urlId('server'),
-                'unshelve' => $this->params->nullAction()
+                'unshelve' => $this->params->nullAction(),
             ],
         ];
     }
 
-    public function lockServer() : array
+    public function lockServer(): array
     {
         return [
             'method'  => 'POST',
             'path'    => 'servers/{id}/action',
             'params'  => [
                 'id'   => $this->params->urlId('server'),
-                'lock' => $this->params->nullAction()
+                'lock' => $this->params->nullAction(),
             ],
         ];
     }
 
-    public function unlockServer() : array
+    public function unlockServer(): array
     {
         return [
             'method'  => 'POST',
             'path'    => 'servers/{id}/action',
             'params'  => [
                 'id'     => $this->params->urlId('server'),
-                'unlock' => $this->params->nullAction()
+                'unlock' => $this->params->nullAction(),
             ],
         ];
     }

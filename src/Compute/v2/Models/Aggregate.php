@@ -1,17 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace OpenStack\Compute\v2\Models;
 
 use OpenStack\Common\Resource\Listable;
-use OpenStack\Common\Resource\Retrievable;
 use OpenStack\Common\Resource\OperatorResource;
+use OpenStack\Common\Resource\Retrievable;
 
 /**
  * @property \OpenStack\Compute\v2\Api $api
  */
-class Aggregate extends OperatorResource implements
-    Retrievable,
-    Listable
+class Aggregate extends OperatorResource implements Retrievable, Listable
 {
     /** @var int */
     public $id;
@@ -25,7 +25,7 @@ class Aggregate extends OperatorResource implements
     /** @var string */
     public $deletedAt;
 
-    /** @var boolean */
+    /** @var bool */
     public $deleted;
 
     /** @var array */
@@ -43,14 +43,14 @@ class Aggregate extends OperatorResource implements
     /** @var string */
     public $uuid;
 
-    protected $resourceKey = 'aggregate';
+    protected $resourceKey  = 'aggregate';
     protected $resourcesKey = 'aggregates';
 
     protected $aliases = [
       'availability_zone' => 'availabilityZone',
       'created_at'        => 'createdAt',
       'deleted_at'        => 'deletedAt',
-      'updated_at'        => 'updatedAt'
+      'updated_at'        => 'updatedAt',
     ];
 
     /**

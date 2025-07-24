@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace OpenStack\Compute\v2\Models;
 
@@ -8,10 +10,8 @@ use OpenStack\Common\Resource\OperatorResource;
 /**
  * @property \OpenStack\Compute\v2\Api $api
  */
-class InstanceAction extends OperatorResource implements
-    Listable
+class InstanceAction extends OperatorResource implements Listable
 {
-
     /** @var string */
     public $requestId;
 
@@ -30,15 +30,14 @@ class InstanceAction extends OperatorResource implements
     /** @var array */
     public $events;
 
-    protected $resourceKey = 'instanceAction';
+    protected $resourceKey  = 'instanceAction';
     protected $resourcesKey = 'instanceActions';
 
     protected $aliases = [
       'instance_uuid' => 'instanceUuid',
-      'project_id' => 'projectId',
-      'request_id' => 'requestId',
-      'start_time' => 'startTime',
-      'user_id' => 'userId'
+      'project_id'    => 'projectId',
+      'request_id'    => 'requestId',
+      'start_time'    => 'startTime',
+      'user_id'       => 'userId',
     ];
-
 }

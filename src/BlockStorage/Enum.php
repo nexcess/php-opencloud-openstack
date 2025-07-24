@@ -1,33 +1,33 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace OpenStack\BlockStorage\v2;
 
 /**
  * Represents common constants.
- *
- * @package OpenStack\BlockStorage\v2
  */
 abstract class Enum
 {
-    const STATUS_AVAILABLE = 'available';
-    const STATUS_CREATING = 'creating';
-    const STATUS_RESERVED = 'reserved';
-    const STATUS_ATTACHING = 'attaching';
-    const STATUS_DETACHING = 'detaching';
-    const STATUS_IN_USE = 'in-use';
-    const STATUS_MAINTENANCE = 'maintenance';
-    const STATUS_DELETING = 'deleting';
-    const STATUS_AWAITING_TRANSFER = 'awaiting-transfer';
-    const STATUS_ERROR = 'error';
-    const STATUS_ERROR_DELETING = 'error_deleting';
-    const STATUS_BACKING_UP = 'backing-up';
-    const STATUS_ERROR_BACKING_UP = 'error_backing-up';
-    const STATUS_ERROR_RESTORING = 'error_restoring';
-    const STATUS_DOWNLOADING = 'downloading';
-    const STATUS_UPLOADING = 'uploading';
-    const STATUS_RETYPINGi = 'retyping';
-    const STATUS_EXTENDING = 'extending';
+    public const STATUS_AVAILABLE         = 'available';
+    public const STATUS_CREATING          = 'creating';
+    public const STATUS_RESERVED          = 'reserved';
+    public const STATUS_ATTACHING         = 'attaching';
+    public const STATUS_DETACHING         = 'detaching';
+    public const STATUS_IN_USE            = 'in-use';
+    public const STATUS_MAINTENANCE       = 'maintenance';
+    public const STATUS_DELETING          = 'deleting';
+    public const STATUS_AWAITING_TRANSFER = 'awaiting-transfer';
+    public const STATUS_ERROR             = 'error';
+    public const STATUS_ERROR_DELETING    = 'error_deleting';
+    public const STATUS_BACKING_UP        = 'backing-up';
+    public const STATUS_ERROR_BACKING_UP  = 'error_backing-up';
+    public const STATUS_ERROR_RESTORING   = 'error_restoring';
+    public const STATUS_DOWNLOADING       = 'downloading';
+    public const STATUS_UPLOADING         = 'uploading';
+    public const STATUS_RETYPINGi         = 'retyping';
+    public const STATUS_EXTENDING         = 'extending';
 
-    const ATTACH_STATUS_ATTACHED = 'attached';
-    const ATTACH_STATUS_DETACHED = 'detached';
+    public const ATTACH_STATUS_ATTACHED = 'attached';
+    public const ATTACH_STATUS_DETACHED = 'detached';
 }
