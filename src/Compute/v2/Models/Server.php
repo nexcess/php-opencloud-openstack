@@ -683,4 +683,42 @@ class Server extends OperatorResource implements Creatable, Updateable, Deletabl
     {
         $this->execute($this->api->deleteVolumeAttachments(), ['id' => $this->id, 'attachmentId' => $attachmentId]);
     }
+
+
+    /**
+     * Get the console log.
+     *
+     * @param int $length Number of lines of console log to grab.
+     *
+     * @return string - the console log output
+     */
+    public function getConsoleLog(int $length = 50): string
+    {
+        $response = $this->execute($this->api->getConsoleLog(), ['id' => $this->id, 'length' => $length]);
+        return Utils::jsonDecode($response)['output'];
+    }
+
+
+    /**
+     * Get a Generator for the instance actions
+     *
+     * @return \Generator
+     */
+    public function listInstanceActions(): \Generator
+    {
+        return $this->model(InstanceAction::class)->enumerate($this->api->getInstanceActions(), ['id' => $this->id]);
+    }
+
+    /**
+     * Get a specific instance action
+     *
+     * @string The request ID of the instance action
+     * @return InstanceAction
+     */
+    public function getInstanceAction(string $requestId): InstanceAction
+    {
+        $response = $this->execute($this->api->getInstanceAction(), ['id' => $this->id, 'requestId' => $requestId]);
+
+        return $this->model(InstanceAction::class)->populateFromResponse($response);
+    }
 }

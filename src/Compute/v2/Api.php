@@ -973,4 +973,82 @@ class Api extends AbstractApi
             ],
         ];
     }
+
+    public function getAggregates(): array
+    {
+        return [
+            'method'  => 'GET',
+            'path'    => 'os-aggregates',
+            'jsonKey' => 'aggregates',
+            'params'  => [
+                'limit'  => $this->params->limit(),
+                'marker' => $this->params->marker()
+            ],
+        ];
+    }
+
+    public function getAggregate(): array
+    {
+        return [
+            'method' => 'GET',
+            'path'   => 'os-aggregates/{id}',
+            'params' => ['id' => $this->params->urlId('id')]
+        ];
+    }
+
+    public function getConsoleLog(): array
+    {
+        return [
+            'method' => 'POST',
+            'path' => 'servers/{id}/action',
+            'jsonKey' => 'os-getConsoleOutput',
+            'params' => [
+                'id' => $this->params->urlId('server'),
+                'length' => $this->params->consoleLogLength()
+            ]
+        ];
+    }
+
+    public function getInstanceActions(): array
+    {
+        return [
+            'method' => 'GET',
+            'path'   => 'servers/{id}/os-instance-actions',
+            'params' => [
+                'id' => $this->params->urlId('server')
+            ]
+        ];
+    }
+
+    public function getInstanceAction(): array
+    {
+        return [
+            'method' => 'GET',
+            'path'   => 'servers/{id}/os-instance-actions/{requestId}',
+            'params' => [
+                'id'        => $this->params->urlId('server'),
+                'requestId' => $this->params->urlId('request')
+            ]
+        ];
+    }
+
+    public function getNetworkIpAvailability() : array
+    {
+        return [
+            'method' => 'GET',
+            'path'   => $this->pathPrefix . '/network-ip-availabilities/{id}',
+            'params' => ['id' => $this->params->urlId('network')],
+        ];
+    }
+
+    public function getNetworkIpAvailabilities(): array
+    {
+        return [
+            'method' => 'GET',
+            'path'   => $this->pathPrefix . '/network-ip-availabilities',
+            'params' => [
+                'tenantId' => $this->params->queryTenantId()
+            ]
+        ];
+    }
 }
