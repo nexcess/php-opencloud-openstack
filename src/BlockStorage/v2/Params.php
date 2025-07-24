@@ -296,23 +296,4 @@ TYPEOTHER
             'description' => 'The UUID of the project in a multi-tenancy cloud.',
         ];
     }
-
-    public function nullAction(): array
-    {
-        return [
-            'type'     => self::NULL_TYPE,
-            'location' => self::JSON,
-            'required' => true,
-        ];
-    }
-
-    public function status(): array
-    {
-        return [
-            'type'        => self::STRING_TYPE,
-            'location'    => self::JSON,
-            'required'    => true,
-            'description' => 'The new status of the volume',
-        ];
-    }
 }
