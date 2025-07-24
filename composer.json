@@ -25,9 +25,9 @@
             "homepage": "https://github.com/k0ka"
         },
         {
-          "name": "Dave Mednick",
-          "email": "david.mednick@nexcess.net",
-          "homepage": "https://github.com/davemednick"
+            "name": "Dave Mednick",
+            "email": "david.mednick@nexcess.net",
+            "homepage": "https://github.com/davemednick"
         }
     ],
     "homepage": "https://github.com/php-opencloud/openstack",
