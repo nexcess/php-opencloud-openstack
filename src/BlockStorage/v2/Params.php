@@ -297,13 +297,12 @@ TYPEOTHER
         ];
     }
 
-
     public function nullAction(): array
     {
         return [
             'type'     => self::NULL_TYPE,
             'location' => self::JSON,
-            'required' => true
+            'required' => true,
         ];
     }
 

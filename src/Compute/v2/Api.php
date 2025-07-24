@@ -982,7 +982,7 @@ class Api extends AbstractApi
             'jsonKey' => 'aggregates',
             'params'  => [
                 'limit'  => $this->params->limit(),
-                'marker' => $this->params->marker()
+                'marker' => $this->params->marker(),
             ],
         ];
     }
@@ -992,20 +992,20 @@ class Api extends AbstractApi
         return [
             'method' => 'GET',
             'path'   => 'os-aggregates/{id}',
-            'params' => ['id' => $this->params->urlId('id')]
+            'params' => ['id' => $this->params->urlId('id')],
         ];
     }
 
     public function getConsoleLog(): array
     {
         return [
-            'method' => 'POST',
-            'path' => 'servers/{id}/action',
+            'method'  => 'POST',
+            'path'    => 'servers/{id}/action',
             'jsonKey' => 'os-getConsoleOutput',
-            'params' => [
-                'id' => $this->params->urlId('server'),
-                'length' => $this->params->consoleLogLength()
-            ]
+            'params'  => [
+                'id'     => $this->params->urlId('server'),
+                'length' => $this->params->consoleLogLength(),
+            ],
         ];
     }
 
@@ -1015,8 +1015,8 @@ class Api extends AbstractApi
             'method' => 'GET',
             'path'   => 'servers/{id}/os-instance-actions',
             'params' => [
-                'id' => $this->params->urlId('server')
-            ]
+                'id' => $this->params->urlId('server'),
+            ],
         ];
     }
 
@@ -1027,16 +1027,16 @@ class Api extends AbstractApi
             'path'   => 'servers/{id}/os-instance-actions/{requestId}',
             'params' => [
                 'id'        => $this->params->urlId('server'),
-                'requestId' => $this->params->urlId('request')
-            ]
+                'requestId' => $this->params->urlId('request'),
+            ],
         ];
     }
 
-    public function getNetworkIpAvailability() : array
+    public function getNetworkIpAvailability(): array
     {
         return [
             'method' => 'GET',
-            'path'   => $this->pathPrefix . '/network-ip-availabilities/{id}',
+            'path'   => $this->pathPrefix.'/network-ip-availabilities/{id}',
             'params' => ['id' => $this->params->urlId('network')],
         ];
     }
@@ -1045,10 +1045,10 @@ class Api extends AbstractApi
     {
         return [
             'method' => 'GET',
-            'path'   => $this->pathPrefix . '/network-ip-availabilities',
+            'path'   => $this->pathPrefix.'/network-ip-availabilities',
             'params' => [
-                'tenantId' => $this->params->queryTenantId()
-            ]
+                'tenantId' => $this->params->queryTenantId(),
+            ],
         ];
     }
 }

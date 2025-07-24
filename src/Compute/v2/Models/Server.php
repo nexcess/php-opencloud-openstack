@@ -654,25 +654,22 @@ class Server extends OperatorResource implements Creatable, Updateable, Deletabl
         $this->execute($this->api->deleteVolumeAttachments(), ['id' => $this->id, 'attachmentId' => $attachmentId]);
     }
 
-
     /**
      * Get the console log.
      *
-     * @param int $length Number of lines of console log to grab.
+     * @param int $length number of lines of console log to grab
      *
      * @return string - the console log output
      */
     public function getConsoleLog(int $length = 50): string
     {
         $response = $this->execute($this->api->getConsoleLog(), ['id' => $this->id, 'length' => $length]);
+
         return Utils::jsonDecode($response)['output'];
     }
 
-
     /**
-     * Get a Generator for the instance actions
-     *
-     * @return \Generator
+     * Get a Generator for the instance actions.
      */
     public function listInstanceActions(): \Generator
     {
@@ -680,10 +677,9 @@ class Server extends OperatorResource implements Creatable, Updateable, Deletabl
     }
 
     /**
-     * Get a specific instance action
+     * Get a specific instance action.
      *
      * @string The request ID of the instance action
-     * @return InstanceAction
      */
     public function getInstanceAction(string $requestId): InstanceAction
     {
